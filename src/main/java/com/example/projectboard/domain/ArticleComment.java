@@ -1,5 +1,6 @@
 package com.example.projectboard.domain;
 
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -61,5 +62,4 @@ public class ArticleComment {
     public int hashCode() {
         return Objects.hash(id);
     }
-}
 

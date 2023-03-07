@@ -1,5 +1,6 @@
 package com.example.projectboard.domain;
 
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -70,4 +71,4 @@ public class Article {
     public int hashCode() {
         return Objects.hash(id);
     }
-}
+  
