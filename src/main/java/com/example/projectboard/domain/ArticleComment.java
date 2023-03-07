@@ -28,17 +28,24 @@ public class ArticleComment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Setter
-    @ManyToOne(optional = false) private Article article; // 게시글 (ID)
-    @Setter @Column(nullable = false,length = 500) private String content; // 내용
+    @ManyToOne(optional = false)
+    private Article article; // 게시글 (ID)
+    @Setter
+    @Column(nullable = false, length = 500)
+    private String content; // 내용
 
     @CreatedDate
-    @Column(nullable = false) private LocalDateTime createdAt; // 생성일시
+    @Column(nullable = false)
+    private LocalDateTime createdAt; // 생성일시
     @CreatedBy
-    @Column(nullable = false, length = 100) private String createdBy; // 생성자
+    @Column(nullable = false, length = 100)
+    private String createdBy; // 생성자
     @LastModifiedDate
-    @Column(nullable = false) private LocalDateTime modifiedAt; //수정일시
+    @Column(nullable = false)
+    private LocalDateTime modifiedAt; //수정일시
     @LastModifiedBy
-    @Column(nullable = false, length = 100) private String modifiedBy;//수정자
+    @Column(nullable = false, length = 100)
+    private String modifiedBy;//수정자
 
     protected ArticleComment() {
     }
@@ -47,6 +54,7 @@ public class ArticleComment {
         this.article = article;
         this.content = content;
     }
+
     public static ArticleComment of(Article article, String content) {
         return new ArticleComment(article, content);
     }
@@ -55,11 +63,12 @@ public class ArticleComment {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ArticleComment that)) return false;
-        return id != null &&id.equals(that.id);
+        return id != null && id.equals(that.id);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id);
     }
+}
 
