@@ -38,7 +38,7 @@ class ArticleControllerTest {
 
     }
 
-    @Disabled("구현 중")
+
     @DisplayName("[view][GET] 게시글 상세 페이지 - 정상 호출")
     @Test
     public void givenNothing_whenRequestingArticleView_thenReturnsArticleView() throws Exception {
@@ -49,7 +49,7 @@ class ArticleControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("articles/detail"))
-                .andExpect(model().attributeExists("articles"))// 이 이름에 데이터가 존재하는지만 판단.
+                .andExpect(model().attributeExists("article"))// 이 이름에 데이터가 존재하는지만 판단.
                 .andExpect(model().attributeExists("articleComments"));
     }
     @Disabled("구현 중")
