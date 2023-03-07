@@ -32,7 +32,7 @@ class ArticleControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.TEXT_HTML))
                 .andExpect(view().name("articles/index"))
-                .andExpect(model().attributeExists("articles"))// 이 이름에 데이터가 존재하는지만 판단.
+                .andExpect(model().attributeExists("articles"));// 이 이름에 데이터가 존재하는지만 판단.
 
 
 
