@@ -1,7 +1,6 @@
 package com.example.projectboard.service;
 
 import com.example.projectboard.DTO.ArticleDto;
-import com.example.projectboard.DTO.ArticleUpdateDto;
 import com.example.projectboard.DTO.ArticleWithCommentsDto;
 import com.example.projectboard.DTO.UserAccountDto;
 import com.example.projectboard.domain.Article;
@@ -19,13 +18,11 @@ import org.springframework.data.domain.Pageable;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.doNothing;
 
 @DisplayName("비즈니스 로직 - 게시글")
 @ExtendWith(MockitoExtension.class)
@@ -52,14 +49,14 @@ class ArticleServiceTest {
         SearchType searchType = SearchType.TITLE;
         String searchKeyword = "title";
         Pageable pageable = Pageable.ofSize(20);
-        given(articleRepository.findByTitle(searchKeyword, pageable)).willReturn(Page.empty());
+        given(articleRepository.findByTitleContaining(searchKeyword, pageable)).willReturn(Page.empty());
 
         // When
         Page<ArticleDto> articles = sut.searchArticles(searchType, searchKeyword, pageable);
 
         // Then
         assertThat(articles).isEmpty();
-        then(articleRepository).should().findByTitle(searchKeyword, pageable);
+        then(articleRepository).should().findByTitleContaining(searchKeyword, pageable);
     }
 
 
@@ -167,7 +164,7 @@ class ArticleServiceTest {
                     "minu",
                     "password",
                     "minu@email.com",
-                    "Uno",
+                    "Minu",
                     null
             );
         }
@@ -192,9 +189,9 @@ class ArticleServiceTest {
                     content,
                     hashtag,
                     LocalDateTime.now(),
-                    "Uno",
+                    "Minu",
                     LocalDateTime.now(),
-                    "Uno");
+                    "Minu");
         }
 
         private UserAccountDto createUserAccountDto() {
@@ -203,7 +200,7 @@ class ArticleServiceTest {
                     "minu",
                     "password",
                     "minu@mail.com",
-                    "Uno",
+                    "Minu",
                     "This is memo",
                     LocalDateTime.now(),
                     "minu",
