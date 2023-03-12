@@ -83,7 +83,7 @@ class JpaRepositoryTest {
         Article article = articleRepository.findById(1L).orElseThrow();
         long previousArticleCount =  articleRepository.count();
         long previousArticleCommentCount = articleCommentRepository.count();
-        int deletedCommentSize = article.getArticleCommentSet().size();
+        int deletedCommentSize = article.getArticleComments().size();
 
         String updatedHashtag = "#springboot";
         article.setHashtag(updatedHashtag);
