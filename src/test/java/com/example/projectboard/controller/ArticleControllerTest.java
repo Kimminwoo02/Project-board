@@ -25,8 +25,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -148,20 +147,60 @@ class ArticleControllerTest {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(model().attributeExists("articles/search"));
     }
-    @Disabled("구현 중")
-    @DisplayName("[view][GET] 게시글 해시태그 검색 페이지 - 정상 호출")
+    @DisplayName("[view][GET] 게시글 해시태그 검색 페이지 - 정상 호출, 해시태그 입력")
     @Test
-    public void givenNothing_whenRequestingArticleHashtagView_thenReturnsArticleHashtagView() throws Exception {
-        //given
+    public void givenHashtag_whenRequestingArticleSearchHashtagView_thenReturnsArticleSearchHashtagView() throws Exception {
+        // Given
+        String hashtag = "#java";
+        List<String> hashtags = List.of("#java", "#spring", "#boot");
+        given(articleService.searchArticlesViaHashtag(eq(hashtag), any(Pageable.class))).willReturn(Page.empty());
+        given(articleService.getHashtags()).willReturn(hashtags);
+        given(paginationService.getPaginationBarNumber(anyInt(), anyInt())).willReturn(List.of(1, 2, 3, 4, 5));
 
-        //when&then
-        mvc.perform(get("/articles/search-hashtag"))
+        // When & Then
+        mvc.perform(
+                        get("/articles/search-hashtag")
+                                .queryParam("searchValue", hashtag)
+                )
                 .andExpect(status().isOk())
-                .andExpect(view().name("articles/index"))
-                .andExpect(model().attributeExists("articles/search-hashtag"))
-                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+                .andExpect(view().name("articles/search-hashtag"))
+                .andExpect(model().attribute("articles", Page.empty()))
+                .andExpect(model().attribute("hashtags", hashtags))
+                .andExpect(model().attributeExists("paginationBarNumbers"))
+                .andExpect(model().attribute("searchType", SearchType.HASHTAG));
+        then(articleService).should().searchArticlesViaHashtag(eq(hashtag), any(Pageable.class));
+        then(articleService).should().getHashtags();
+        then(paginationService).should().getPaginationBarNumber(anyInt(), anyInt());
     }
 
+
+    @DisplayName("[view][GET] 게시글 해시태그 검색 페이지 - 정상 호출, 해시태그 입력")
+    @Test
+    public void givenHashtag_whenRequestingArticleHashtagView_thenReturnsArticleHashtagView() throws Exception {
+        //given
+        String hashtag = "#java";
+        List<String> hashtags = List.of("#java", "#spring", "#boot");
+        given(articleService.searchArticlesViaHashtag(eq(hashtag),any(Pageable.class))).willReturn(Page.empty());
+        given(articleService.getHashtags()).willReturn(hashtags);
+        given(paginationService.getPaginationBarNumber(anyInt(),anyInt())).willReturn(List.of(1,2,3,4,5));
+
+        //when&then
+        mvc.perform(get("/articles/search-hashtag")
+                        .queryParam("searchValue",hashtag)
+                )
+                .andExpect(status().isOk())
+                .andExpect(view().name("articles/search-hashtag"))
+                .andExpect(model().attribute("articles",Page.empty()))
+                .andExpect(model().attribute("hashtags",hashtags))
+                .andExpect(model().attributeExists("paginationBarNumbers"))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+                        .andExpect(model().attribute("searchType",SearchType.HASHTAG));
+
+        then(articleService).should().searchArticlesViaHashtag(eq(hashtag),any(Pageable.class));
+        then(articleService).should().getHashtags();
+        then(paginationService).should().getPaginationBarNumber(anyInt(), anyInt());
+    }
 
 
 
