@@ -139,7 +139,6 @@ class ArticleCommentServiceTest {
 
     private UserAccountDto createUserAccountDto() {
         return UserAccountDto.of(
-                1L,
                 "minu",
                 "password",
                 "made_power@naver.com",
