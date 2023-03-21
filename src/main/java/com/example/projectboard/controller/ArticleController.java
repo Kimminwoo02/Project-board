@@ -98,8 +98,8 @@ public class ArticleController {
     @PostMapping ("/{articleId}/form")
     public String updateArticle(@PathVariable Long articleId, ArticleRequest articleRequest) {
         // TODO: 인증 정보를 넣어줘야 한다.
-        articleService.updateArticle(articleRequest.toDto(UserAccountDto.of(
-                "minu", "asdf1234", "minu@mail.com", "minu", "memo", null, null, null, null
+        articleService.updateArticle(articleId, articleRequest.toDto(UserAccountDto.of(
+                "minu", "asdf1234", "uno@mail.com", "minu", "memo", null, null, null, null
         )));
 
         return "redirect:/articles/" + articleId;

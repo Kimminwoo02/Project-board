@@ -31,14 +31,12 @@ import java.util.List;
 import java.util.Set;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 @DisplayName("View 컨트롤러 - 게시글")
-
 @Import({SecurityConfig.class, FormDataEncoder.class})
 @WebMvcTest(ArticleController.class)
 class ArticleControllerTest {
@@ -271,7 +269,7 @@ class ArticleControllerTest {
         // Given
         long articleId = 1L;
         ArticleRequest articleRequest = ArticleRequest.of("new title", "new content", "#new");
-        willDoNothing().given(articleService).updateArticle(any(ArticleDto.class));
+        willDoNothing().given(articleService).updateArticle(eq(articleId), any(ArticleDto.class));
 
         // When & Then
         mvc.perform(
@@ -283,7 +281,7 @@ class ArticleControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/articles/" + articleId))
                 .andExpect(redirectedUrl("/articles/" + articleId));
-        then(articleService).should().updateArticle(any(ArticleDto.class));
+        then(articleService).should().updateArticle(eq(articleId), any(ArticleDto.class));
     }
 
     @DisplayName("[view][POST] 게시글 삭제 - 정상 호출")

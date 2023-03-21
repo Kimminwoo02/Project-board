@@ -173,37 +173,36 @@ class ArticleServiceTest {
     @Test
     void givenArticleInfo_whenSavingArticle_thenSavesArticle() {
         // Given
-
         ArticleDto dto = createArticleDto();
-        given(userAccountRepository.getReferenceById(Long.valueOf(dto.userAccountDto().userId()))).willReturn(createUserAccount());
         given(articleRepository.save(any(Article.class))).willReturn(createArticle());
 
         // When
-
         sut.saveArticle(dto);
 
         // Then
-        then(userAccountRepository).should().getReferenceById(Long.valueOf(dto.userAccountDto().userId()));
         then(articleRepository).should().save(any(Article.class));
     }
 
 
     @DisplayName("게시글의 수정 정보를 입력하면, 게시글을 수정한다.")
     @Test
-    void  givenModifiedArticleInfo_whenUpdatingArticle_thenUpdatesArticle() {
-
+    void givenModifiedArticleInfo_whenUpdatingArticle_thenUpdatesArticle() {
+        // Given
         Article article = createArticle();
         ArticleDto dto = createArticleDto("새 타이틀", "새 내용", "#springboot");
         given(articleRepository.getReferenceById(dto.id())).willReturn(article);
 
-        sut.updateArticle(dto);
+        // When
+        sut.updateArticle(dto.id(), dto);
 
+        // Then
         assertThat(article)
                 .hasFieldOrPropertyWithValue("title", dto.title())
                 .hasFieldOrPropertyWithValue("content", dto.content())
                 .hasFieldOrPropertyWithValue("hashtag", dto.hashtag());
         then(articleRepository).should().getReferenceById(dto.id());
     }
+
 
 
     @DisplayName("없는 게시글의 수정 정보를 입력하면, 경고 로그를 찍고 아무 것도 하지 않는다.")
@@ -214,10 +213,9 @@ class ArticleServiceTest {
         given(articleRepository.getReferenceById(dto.id())).willThrow(EntityNotFoundException.class);
 
         // When
-        sut.updateArticle(dto);
+        sut.updateArticle(dto.id(), dto);
 
         // Then
-
         then(articleRepository).should().getReferenceById(dto.id());
     }
 

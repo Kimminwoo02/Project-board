@@ -25,6 +25,8 @@ public record ArticleDto(
         return new ArticleDto(id, userAccountDto, title, content, hashtag, createdAt, createdBy, modifiedAt, modifiedBy);
     }
 
+
+
     public static ArticleDto from(Article entity) {
         return new ArticleDto(
                 entity.getId(),

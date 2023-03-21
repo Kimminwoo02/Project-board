@@ -55,14 +55,14 @@ public class ArticleService {
 
 
     public void saveArticle(ArticleDto dto) {
-        UserAccount userAccount = userAccountRepository.getReferenceById(Long.valueOf(dto.userAccountDto().userId()));
+        UserAccount userAccount = userAccountRepository.getReferenceById(dto.userAccountDto().userId());
         articleRepository.save(dto.toEntity(userAccount));
     }
 
 
-        public void updateArticle(ArticleDto dto) {
+        public void updateArticle(Long articleId,ArticleDto dto) {
         try{
-            Article article = articleRepository.getReferenceById(Long.valueOf(dto.userAccountDto().userId()));
+            Article article = articleRepository.getReferenceById(articleId);
             if(dto.title()!=null){
                 article.setTitle(dto.title());
             }

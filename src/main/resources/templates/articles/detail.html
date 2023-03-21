@@ -32,12 +32,22 @@
              </article>
       </div>
 
-     <div class="row g-5">
+            <div class="row g-5" id="article-buttons">
+                <form id="delete-article-form">
+                    <div class="pb-5 d-grid gap-2 d-md-block">
+                        <a class="btn btn-success me-md-2" role="button" id="update-article">수정</a>
+                        <button class="btn btn-danger me-md-2" type="submit">삭제</button>
+                    </div>
+                </form>
+            </div>
+
+  <div class="row g-5">
          <section>
-             <form class="row g-3">
+             <form class="row g-3" id="comment-form">
+                 <input type="hidden" class="article-id">
                  <div class="col-8">
                      <label for="comment-textbox" hidden> 댓글</label>
-                     <textarea class="form-control" id="comment-textbox" placeholder="댓글 쓰기" rows="3"></textarea>
+                     <textarea class="form-control" id="comment-textbox" placeholder="댓글 쓰기.." rows="3" required></textarea>
                  </div>
                  <div class="col-auto">
                      <label for="comment-submit" hidden>댓글 쓰기</label>
@@ -45,40 +55,36 @@
                  </div>
              </form>
 
-             <ul id="article-comments" class="row col-7">
+             <ul id="article-comments" class="row col-md-10 col-lg-8 pt-3">
                  <li>
-                     <div>
-                         <time><small>2023-03-10</small></time>
-                         <strong>Minu</strong>
-                         <p>
-                             게시판 예시글 작성중입니다.1111<br>
-                             게시판 예시글 작성중입니다.111122222
-                         </p>
-                     </div>
+                     <form class="comment-form">
+                         <input type="hidden" class="article-id">
+                         <div class="row">
+                             <div class="col-md-10 col-lg-9">
+                                 <strong>Minu</strong>
+                                 <small><time>2023-03-10</time></small>
+                                 <p>
+                                     Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
+                                     Lorem ipsum dolor sit amet
+                                 </p>
+                             </div>
+                             <div class="col-2 mb-3">
+                                 <button type="submit" class="btn btn-outline-danger" id="delete-comment-button">삭제</button>
+                             </div>
+                         </div>
+                     </form>
                  </li>
                  <li>
                      <div>
-                         <time><small>2023-03-10</small></time>
-                         <strong>Minu</strong>
+                         <strong>Uno</strong>
+                         <small><time>2023-03-20</time></small>
                          <p>
-                             게시판 예시글 작성중입니다.1111<br>
-                             게시판 예시글 작성중입니다.111122222
-                         </p>
-                     </div>
-                 </li>
-                 <li>
-                     <div>
-                         <time><small>2023-03-10</small></time>
-                         <strong>Minu</strong>
-                         <p>
-                             게시판 예시글 작성중입니다.1111<br>
-                             게시판 예시글 작성중입니다.111122222
+                             Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>
+                             Lorem ipsum dolor sit amet
                          </p>
                      </div>
                  </li>
              </ul>
-
-
          </section>
      </div>
 
