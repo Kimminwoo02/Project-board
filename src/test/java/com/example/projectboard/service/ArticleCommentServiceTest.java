@@ -7,6 +7,7 @@ import com.example.projectboard.domain.ArticleComment;
 import com.example.projectboard.domain.UserAccount;
 import com.example.projectboard.repository.ArticleCommentRepository;
 import com.example.projectboard.repository.ArticleRepository;
+import com.example.projectboard.repository.UserAccountRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,36 +27,42 @@ import static org.mockito.BDDMockito.*;
 @DisplayName("비즈니스 로직 - 댓글")
 @ExtendWith(MockitoExtension.class)
 class ArticleCommentServiceTest {
-    @InjectMocks
-    private ArticleCommentService sut;
-    @Mock
-    private ArticleCommentRepository articleCommentRepository;
-    @Mock
-    private ArticleRepository articleRepository;
 
-    @DisplayName("게시글 Id로 조회하면, 해당하는 댓글 리스트를 반환한다.")
+    @InjectMocks private ArticleCommentService sut;
+
+    @Mock private ArticleRepository articleRepository;
+    @Mock private ArticleCommentRepository articleCommentRepository;
+
+    @DisplayName("게시글 ID로 조회하면, 해당하는 댓글 리스트를 반환한다.")
     @Test
-    void givenArticleId_whenSearchingComments_thenReturnsComments() {
+    void givenArticleId_whenSearchingArticleComments_thenReturnsArticleComments() {
+        // Given
         Long articleId = 1L;
         ArticleComment expected = createArticleComment("content");
-
         given(articleCommentRepository.findByArticle_Id(articleId)).willReturn(List.of(expected));
+
+        // When
         List<ArticleCommentDto> actual = sut.searchArticleComments(articleId);
 
+        // Then
         assertThat(actual)
                 .hasSize(1)
                 .first().hasFieldOrPropertyWithValue("content", expected.getContent());
-
+        then(articleCommentRepository).should().findByArticle_Id(articleId);
     }
 
-
-    @DisplayName("댓글 정보를 입력하면 댓글을 저장한다.")
+    @DisplayName("댓글 정보를 입력하면, 댓글을 저장한다.")
     @Test
-    void givenArticlId_whenSearchingComments_thenReturnsComments() {
+    void givenArticleCommentInfo_whenSavingArticleComment_thenSavesArticleComment() {
+        // Given
         ArticleCommentDto dto = createArticleCommentDto("댓글");
         given(articleRepository.getReferenceById(dto.articleId())).willReturn(createArticle());
         given(articleCommentRepository.save(any(ArticleComment.class))).willReturn(null);
+
+        // When
         sut.saveArticleComment(dto);
+
+        // Then
         then(articleRepository).should().getReferenceById(dto.articleId());
         then(articleCommentRepository).should().save(any(ArticleComment.class));
     }
@@ -114,13 +121,14 @@ class ArticleCommentServiceTest {
     void givenArticleCommentId_whenDeletingArticleComment_thenDeletesArticleComment() {
         // Given
         Long articleCommentId = 1L;
-        willDoNothing().given(articleCommentRepository).deleteById(articleCommentId);
+        String userId = "uno";
+        willDoNothing().given(articleCommentRepository).deleteByIdAndUserAccount_UserId(articleCommentId, userId);
 
         // When
         sut.deleteArticleComment(articleCommentId);
 
         // Then
-        then(articleCommentRepository).should().deleteById(articleCommentId);
+        then(articleCommentRepository).should().deleteByIdAndUserAccount_UserId(articleCommentId, userId);
     }
 
 
@@ -131,9 +139,9 @@ class ArticleCommentServiceTest {
                 createUserAccountDto(),
                 content,
                 LocalDateTime.now(),
-                "uno",
+                "minu",
                 LocalDateTime.now(),
-                "uno"
+                "minu"
         );
     }
 
@@ -141,13 +149,13 @@ class ArticleCommentServiceTest {
         return UserAccountDto.of(
                 "minu",
                 "password",
-                "made_power@naver.com",
-                "Minutarus",
+                "minu@mail.com",
+                "minu",
                 "This is memo",
                 LocalDateTime.now(),
                 "minu",
                 LocalDateTime.now(),
-                "uminu"
+                "minu"
         );
     }
 
@@ -177,6 +185,5 @@ class ArticleCommentServiceTest {
                 "#java"
         );
     }
-
 
 }

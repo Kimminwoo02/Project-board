@@ -23,7 +23,7 @@ public record ArticleResponse(
     public static ArticleResponse from(ArticleDto dto) {
         String nickname = dto.userAccountDto().nickname();
         if (nickname == null || nickname.isBlank()) {
-            nickname = dto.userAccountDto().userId();
+            nickname = String.valueOf(dto.userAccountDto().userId());
         }
 
         return new ArticleResponse(
