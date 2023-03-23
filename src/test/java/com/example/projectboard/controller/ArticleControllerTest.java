@@ -5,7 +5,9 @@ import com.example.projectboard.DTO.ArticleWithCommentsDto;
 import com.example.projectboard.DTO.UserAccountDto;
 import com.example.projectboard.DTO.request.ArticleRequest;
 import com.example.projectboard.DTO.response.ArticleResponse;
+import com.example.projectboard.DTO.security.BoardPrincipal;
 import com.example.projectboard.config.SecurityConfig;
+import com.example.projectboard.config.TestSecurityConfig;
 import com.example.projectboard.domain.constant.FormStatus;
 import com.example.projectboard.domain.constant.SearchType;
 import com.example.projectboard.service.ArticleService;
@@ -24,6 +26,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.TestExecutionEvent;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.mockito.BDDMockito.*;
 import java.time.LocalDateTime;
@@ -37,7 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 @DisplayName("View 컨트롤러 - 게시글")
-@Import({SecurityConfig.class, FormDataEncoder.class})
+@Import({TestSecurityConfig.class, FormDataEncoder.class})
 @WebMvcTest(ArticleController.class)
 class ArticleControllerTest {
     private final MockMvc mvc;
@@ -56,7 +61,7 @@ class ArticleControllerTest {
         this.formDataEncoder = formDataEncoder;
     }
 
-    @DisplayName("[view][GET] 게시글 리스트 (게시판) 페이지 - 정상 호출")
+    @DisplayName("[view][GET] 게시글 리스트 (게시판) 페이지 - 정상 호출 ")
     @Test
     public void givenNothing_whenRequestingArticlesView_thenReturnsArticlesView() throws Exception {
         //given
@@ -126,24 +131,42 @@ class ArticleControllerTest {
         then(paginationService).should().getPaginationBarNumber(pageable.getPageNumber(), Page.empty().getTotalPages());
     }
 
-    @DisplayName("[view][GET] 게시글 상세 페이지 - 정상 호출")
+    @DisplayName("[view][GET] 게시글 페이지 - 인증 없을 땐 로그인 페이지로 이동")
+    @Test
+    void givenNothing_whenRequestingArticlePage_thenRedirectsToLoginPage() throws Exception {
+        // Given
+        long articleId = 1L;
+
+        // When & Then
+        mvc.perform(get("/articles/" + articleId))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrlPattern("**/login"));
+        then(articleService).shouldHaveNoInteractions();
+        then(articleService).shouldHaveNoInteractions();
+    }
+
+    @WithMockUser
+    @DisplayName("[view][GET] 게시글 페이지 - 정상 호출, 인증된 사용자")
     @Test
     public void givenNothing_whenRequestingArticleView_thenReturnsArticleView() throws Exception {
-        //given
+        // Given
         Long articleId = 1L;
+        long totalCount = 1L;
         given(articleService.getArticleWithComments(articleId)).willReturn(createArticleWithCommentsDto());
-        //when&then
+        given(articleService.getArticleCount()).willReturn(totalCount);
+        // When & Then
         mvc.perform(get("/articles/" + articleId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("articles/detail"))
-                .andExpect(model().attributeExists("article"))// 이 이름에 데이터가 존재하는지만 판단.
-                .andExpect(model().attributeExists("articleComments"));
+                .andExpect(model().attributeExists("article"))
+                .andExpect(model().attributeExists("articleComments"))
+                .andExpect(model().attributeExists("articleComments"))
+                .andExpect(model().attribute("totalCount", totalCount));
         then(articleService).should().getArticleWithComments(articleId);
+        then(articleService).should().getArticleCount();
     }
 
-
-    @Disabled("구현 중")
     @DisplayName("[view][GET] 게시글 검색 전용 페이지 - 정상 호출")
     @Test
     public void givenNothing_whenRequestingArticleSearchView_thenReturnsArticleSearchView() throws Exception {
@@ -211,7 +234,7 @@ class ArticleControllerTest {
         then(articleService).should().getHashtags();
         then(paginationService).should().getPaginationBarNumber(anyInt(), anyInt());
     }
-
+    @WithMockUser
     @DisplayName("[view][GET] 새 게시글 작성 페이지")
     @Test
     void givenNothing_whenRequesting_thenReturnsNewArticlePage() throws Exception {
@@ -224,7 +247,7 @@ class ArticleControllerTest {
                 .andExpect(view().name("articles/form"))
                 .andExpect(model().attribute("formStatus", FormStatus.CREATE));
     }
-
+    @WithUserDetails(value = "minuTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[view][POST] 새 게시글 등록 - 정상 호출")
     @Test
     void givenNewArticleInfo_whenRequesting_thenSavesNewArticle() throws Exception {
@@ -245,24 +268,35 @@ class ArticleControllerTest {
         then(articleService).should().saveArticle(any(ArticleDto.class));
     }
 
-    @DisplayName("[view][GET] 게시글 수정 페이지")
+    @DisplayName("[view][GET] 게시글 수정 페이지 - 인증 없을 땐 로그인 페이지로 이동")
     @Test
-    void givenNothing_whenRequesting_thenReturnsUpdatedArticlePage() throws Exception {
+    void givenNothing_whenRequesting_thenReturnsUpdatedArticlePage1() throws Exception {
         // Given
+        long articleId = 1L;
+
+        mvc.perform(get("/articles/"+articleId+"/form"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrlPattern("**/login"));
+        then(articleService).shouldHaveNoInteractions();
+    }
+
+    @WithMockUser
+    @DisplayName("[view][GET] 게시글 수정 페이지 - 정상 호출, 인증된 사용자")
+    @Test
+    void givenNothing_whenRequesting_thenReturnsUpdatedArticlePage() throws Exception{
         long articleId = 1L;
         ArticleDto dto = createArticleDto();
         given(articleService.getArticle(articleId)).willReturn(dto);
 
-        // When & Then
-        mvc.perform(get("/articles/" + articleId + "/form"))
+        mvc.perform(get("/articles/"+ articleId + "/form"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("articles/form"))
-                .andExpect(model().attribute("article", ArticleResponse.from(dto)))
+                .andExpect(model().attribute("article",ArticleResponse.from(dto)))
                 .andExpect(model().attribute("formStatus", FormStatus.UPDATE));
         then(articleService).should().getArticle(articleId);
     }
-
+    @WithUserDetails(value = "minuTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[view][POST] 게시글 수정 - 정상 호출")
     @Test
     void givenUpdatedArticleInfo_whenRequesting_thenUpdatesNewArticle() throws Exception {
@@ -283,13 +317,15 @@ class ArticleControllerTest {
                 .andExpect(redirectedUrl("/articles/" + articleId));
         then(articleService).should().updateArticle(eq(articleId), any(ArticleDto.class));
     }
-
+    @WithUserDetails(value = "minuTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[view][POST] 게시글 삭제 - 정상 호출")
     @Test
+
     void givenArticleIdToDelete_whenRequesting_thenDeletesArticle() throws Exception {
         // Given
         long articleId = 1L;
-        willDoNothing().given(articleService).deleteArticle(articleId);
+        String userId = "MinuTest";
+        willDoNothing().given(articleService).deleteArticle(articleId,userId);
 
         // When & Then
         mvc.perform(
@@ -300,8 +336,11 @@ class ArticleControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/articles"))
                 .andExpect(redirectedUrl("/articles"));
-        then(articleService).should().deleteArticle(articleId);
+        then(articleService).should().deleteArticle(articleId,userId);
     }
+
+
+
 
 
     private ArticleDto createArticleDto() {
