@@ -1,7 +1,7 @@
 # Project-board
 기본적인 게시판 서비스를 클론코딩으로 구현해봄으로써 관련 기술들, 자바17 기능, 개발 도구들을 경험
 
-##개발 환경
+## 개발 환경
 
 * Intellij IDEA Ultimate
 * Java 17
