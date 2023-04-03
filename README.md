@@ -8,7 +8,7 @@
 * Gradle 7.6.1
 * Spring Boot 2.7.0
 
-## 기술 세버 스택
+## 기술 세부 스택
 
 * Spring Boot Actuator
 * Spring Web
