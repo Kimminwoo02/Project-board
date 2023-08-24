@@ -37,7 +37,15 @@ public class Article extends AuditingFields {
     @Setter @Column(nullable = false) private String title; // 제목
     @Setter @Column(nullable = false, length = 10000) private String content; // 본문
 
-    @Setter private String hashtag; // 해시태그
+    @ToString.Exclude
+    @JoinTable(
+            name="article_hashtag",
+            joinColumns = @JoinColumn(name="articleId"),
+            inverseJoinColumns = @JoinColumn(name = "hashtagId")
+    )
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private Set<HashTag> hashTags = new LinkedHashSet<>();
+
 
     @ToString.Exclude
     @OrderBy("createdAt DESC")
@@ -47,15 +55,15 @@ public class Article extends AuditingFields {
 
     protected Article() {}
 
-    private Article(UserAccount userAccount, String title, String content, String hashtag) {
+    private Article(UserAccount userAccount, String title, String content) {
         this.userAccount = userAccount;
         this.title = title;
         this.content = content;
-        this.hashtag = hashtag;
+
     }
 
-    public static Article of(UserAccount userAccount, String title, String content, String hashtag) {
-        return new Article(userAccount, title, content, hashtag);
+    public static Article of(UserAccount userAccount, String title, String content) {
+        return new Article(userAccount, title, content);
     }
 
     @Override
